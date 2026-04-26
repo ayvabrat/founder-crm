@@ -16,6 +16,9 @@ const items = [
 
 export function BottomNav(): React.JSX.Element {
   const pathname = usePathname();
+  if (pathname === "/login") {
+    return <></>;
+  }
   return (
     <nav className="fixed bottom-0 left-0 right-0 mx-auto flex w-full max-w-md items-center justify-around border-t border-zinc-800 bg-background/95 px-2 py-3 backdrop-blur">
       {items.map((item) => {

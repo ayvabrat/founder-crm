@@ -14,9 +14,14 @@ import { useGamificationStore } from "@/store/gamification-store";
 
 export default function ContactsPage(): React.JSX.Element {
   const contacts = useContactsStore((s) => s.contacts);
+  const syncFromServer = useContactsStore((s) => s.syncFromServer);
   const syncTotalContacts = useGamificationStore((s) => s.syncTotalContacts);
   const resetGoalsIfNeeded = useGamificationStore((s) => s.resetGoalsIfNeeded);
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    void syncFromServer();
+  }, [syncFromServer]);
 
   useEffect(() => {
     resetGoalsIfNeeded();

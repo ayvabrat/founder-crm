@@ -1,6 +1,7 @@
 "use client";
 
-import { notFound, useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 import { ContactForm } from "@/components/contacts/ContactForm";
 import { ru } from "@/constants/i18n/ru";
@@ -10,15 +11,20 @@ import type { ContactFormData } from "@/types/contact";
 export default function EditContactPage(): React.JSX.Element {
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const syncFromServer = useContactsStore((s) => s.syncFromServer);
   const contact = useContactsStore((s) => s.getContact(params.id));
   const updateContact = useContactsStore((s) => s.updateContact);
 
-  if (!contact) {
-    return notFound();
-  }
+  useEffect(() => {
+    if (!contact) {
+      void syncFromServer();
+    }
+  }, [contact, syncFromServer]);
 
-  const onSubmit = (data: ContactFormData) => {
-    updateContact(contact.id, data);
+  if (!contact) return <p className="text-sm text-zinc-400">Загружаем контакт...</p>;
+
+  const onSubmit = async (data: ContactFormData) => {
+    await updateContact(contact.id, data);
     router.push(`/contacts/${contact.id}`);
   };
 

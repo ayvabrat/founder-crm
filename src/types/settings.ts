@@ -16,6 +16,18 @@ export interface Settings {
   defaultView: "list" | "grid";
   compactMode: boolean;
   experimentalFeatures: boolean;
+  animations: boolean;
+  debugMode: boolean;
+  offlineMode: boolean;
+  syncInterval: number;
+  encryptSensitiveData: boolean;
+  shareAnalytics: boolean;
+  supabaseEnabled: boolean;
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  supabaseSyncEnabled: boolean;
+  temperature: number;
+  maxTokens: number;
   autoSave: boolean;
   autoCreateFollowUpOnAdd: boolean;
   autoAnalyzeOnAdd: boolean;

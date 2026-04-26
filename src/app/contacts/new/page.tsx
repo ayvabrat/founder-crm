@@ -16,7 +16,7 @@ export default function NewContactPage(): React.JSX.Element {
   const incrementGoal = useGamificationStore((s) => s.incrementGoal);
 
   const onSubmit = async (data: ContactFormData) => {
-    const id = addContact(data);
+    const id = await addContact(data);
     awardForAction("addContact");
     incrementGoal("new_contacts");
     await runAutomationForContact(id);

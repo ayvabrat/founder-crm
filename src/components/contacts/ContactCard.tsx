@@ -15,7 +15,7 @@ export function ContactCard({ contact }: { contact: Contact }): React.JSX.Elemen
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Link href={`/contacts/${contact.id}`}>
-        <Card className="p-4">
+        <Card className="p-4" role="article" aria-label={`Контакт ${contact.name}`}>
           <div className="flex items-start justify-between">
             <div>
               <p className="font-semibold">{contact.name}</p>

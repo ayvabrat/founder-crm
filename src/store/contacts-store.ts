@@ -6,9 +6,10 @@ import type { Contact, ContactFormData, Note } from "@/types/contact";
 
 interface ContactsState {
   contacts: Contact[];
-  addContact: (contact: ContactFormData) => string;
-  updateContact: (id: string, updates: Partial<Contact>) => void;
-  deleteContact: (id: string) => void;
+  syncFromServer: () => Promise<void>;
+  addContact: (contact: ContactFormData) => Promise<string>;
+  updateContact: (id: string, updates: Partial<Contact>) => Promise<void>;
+  deleteContact: (id: string) => Promise<void>;
   addNote: (id: string, note: Omit<Note, "id" | "createdAt">) => void;
   saveAnalysis: (id: string, analysis: AIAnalysis) => void;
   getContact: (id: string) => Contact | undefined;
@@ -18,7 +19,26 @@ export const useContactsStore = create<ContactsState>()(
   persist(
     (set, get) => ({
       contacts: [],
-      addContact: (contactData) => {
+      syncFromServer: async () => {
+        const response = await fetch("/api/contacts", { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { data?: Contact[] };
+        if (!payload.data) return;
+        set({ contacts: payload.data });
+      },
+      addContact: async (contactData) => {
+        const response = await fetch("/api/contacts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(contactData),
+        });
+        if (response.ok) {
+          const payload = (await response.json()) as { data?: Contact };
+          if (payload.data) {
+            set((state) => ({ contacts: [...state.contacts.filter((c) => c.id !== payload.data?.id), payload.data as Contact] }));
+            return payload.data.id;
+          }
+        }
         const id = crypto.randomUUID();
         set((state) => ({
           contacts: [
@@ -34,11 +54,27 @@ export const useContactsStore = create<ContactsState>()(
         }));
         return id;
       },
-      updateContact: (id, updates) =>
+      updateContact: async (id, updates) => {
+        const response = await fetch(`/api/contacts/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        });
+        if (response.ok) {
+          const payload = (await response.json()) as { data?: Contact };
+          if (payload.data) {
+            set((state) => ({ contacts: state.contacts.map((c) => (c.id === id ? payload.data ?? c : c)) }));
+            return;
+          }
+        }
         set((state) => ({
           contacts: state.contacts.map((c) => (c.id === id ? { ...c, ...updates, updatedAt: new Date() } : c)),
-        })),
-      deleteContact: (id) => set((state) => ({ contacts: state.contacts.filter((c) => c.id !== id) })),
+        }));
+      },
+      deleteContact: async (id) => {
+        await fetch(`/api/contacts/${id}`, { method: "DELETE" });
+        set((state) => ({ contacts: state.contacts.filter((c) => c.id !== id) }));
+      },
       addNote: (id, note) =>
         set((state) => ({
           contacts: state.contacts.map((c) =>

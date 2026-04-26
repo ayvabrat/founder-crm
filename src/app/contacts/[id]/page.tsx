@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { notFound, useParams, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { AIAnalysisPanel } from "@/components/ai/AIAnalysisPanel";
 import { IceBreakerGenerator } from "@/components/ai/IceBreakerGenerator";
+import { TelegramAnalysisPanel } from "@/components/telegram/TelegramAnalysisPanel";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ru } from "@/constants/i18n/ru";
@@ -13,10 +15,19 @@ import { useContactsStore } from "@/store/contacts-store";
 export default function ContactDetailPage(): React.JSX.Element {
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const syncFromServer = useContactsStore((s) => s.syncFromServer);
   const contact = useContactsStore((s) => s.getContact(params.id));
   const remove = useContactsStore((s) => s.deleteContact);
 
-  if (!contact) return notFound();
+  useEffect(() => {
+    if (!contact) {
+      void syncFromServer();
+    }
+  }, [contact, syncFromServer]);
+
+  if (!contact) {
+    return <p className="text-sm text-zinc-400">Загружаем контакт...</p>;
+  }
 
   return (
     <div className="space-y-4">
@@ -38,11 +49,12 @@ export default function ContactDetailPage(): React.JSX.Element {
         </Link>
       </Card>
       <AIAnalysisPanel contact={contact} />
+      <TelegramAnalysisPanel contact={contact} />
       <IceBreakerGenerator contact={contact} />
       <Button
         variant="destructive"
-        onClick={() => {
-          remove(contact.id);
+        onClick={async () => {
+          await remove(contact.id);
           router.push("/contacts");
         }}
       >

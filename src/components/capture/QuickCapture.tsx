@@ -25,7 +25,7 @@ export function QuickCapture(): React.JSX.Element {
       setError("Не удалось распознать строку. Пример: Иван Иванов, CTO at TechCorp, met conference");
       return;
     }
-    const id = addContact(parsed);
+    const id = await addContact(parsed);
     awardForAction("addContact");
     incrementGoal("new_contacts");
     await runAutomationForContact(id);
