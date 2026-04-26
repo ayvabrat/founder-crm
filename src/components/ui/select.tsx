@@ -1,0 +1,1 @@
+﻿export function Select({ value, onValueChange, children }: { value: string; onValueChange: (v: string) => void; children: React.ReactNode }): React.JSX.Element { return <select value={value} onChange={(e) => onValueChange(e.target.value)} className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2">{children}</select>; }

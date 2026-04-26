@@ -1,0 +1,1 @@
+﻿export function Switch({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (v: boolean) => void }): React.JSX.Element { return <button className="rounded border border-zinc-700 px-2 py-1 text-xs" onClick={() => onCheckedChange(!checked)}>{checked ? "On" : "Off"}</button>; }

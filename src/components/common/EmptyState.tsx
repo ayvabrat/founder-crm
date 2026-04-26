@@ -1,0 +1,1 @@
+﻿export function EmptyState({ title }: { title: string }): React.JSX.Element { return <p className="rounded-xl border border-dashed border-zinc-700 p-6 text-center text-sm text-zinc-400">{title}</p>; }

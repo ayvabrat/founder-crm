@@ -1,0 +1,1 @@
+﻿export class SecureStorage { static saveApiKey(provider: string, key: string): void { localStorage.setItem(`api_key_${provider}`, btoa(key)); } static getApiKey(provider: string): string | null { const v = localStorage.getItem(`api_key_${provider}`); return v ? atob(v) : null; } static clearApiKey(provider: string): void { localStorage.removeItem(`api_key_${provider}`); } }
